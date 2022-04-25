@@ -16,6 +16,7 @@ const service = Axios.create({
 //创建请求拦截器
 service.interceptors.request.use(
     (config) => {
+        config.headers['Authorization'] = sessionStorage.getItem("token")
         return config
     },
     (error) => {
@@ -26,7 +27,7 @@ service.interceptors.request.use(
 //创建响应拦截器
 service.interceptors.response.use(
     (res) => {
-        console.log('res:::', res)
+        // console.log('res:::', res)
         const {
             meta: { msg, status: code },
             data: result
@@ -39,7 +40,9 @@ service.interceptors.response.use(
             })
 
             if (res.config.url === '/login') {
+                console.log(11);
                 sessionStorage.setItem('token', result.token)
+                console.log(result.token);
             }
 
             return result

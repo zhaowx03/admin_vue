@@ -22,7 +22,7 @@
         <!-- 按钮 -->
         <el-form-item class="login_box_btn">
           <el-button type="primary" @click="goLogin">登录</el-button>
-          <el-button type="error">重置</el-button>
+          <el-button type="error" @click="resetForm">重置</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -35,8 +35,8 @@ export default {
   data() {
     return {
       login_form: {
-        username: '',
-        password: ''
+        username: 'admin',
+        password: '123456'
       },
       rules: {
         username: [
@@ -56,8 +56,11 @@ export default {
       this.$refs.ruleForm.validate(async (valid) => {
         if (!valid) return false
         const res = await LoginApi(this.login_form)
-        this.$router.push('/home')
+        this.$router.push('/welcome')
       })
+    },
+    resetForm() {
+      this.$refs.ruleForm.resetFields()
     }
   }
 }
