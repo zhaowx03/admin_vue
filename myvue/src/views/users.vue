@@ -36,8 +36,8 @@
             <div>
               <el-switch
                 v-model="scope.row.mg_state"
-                active-color="#13ce66"
-                inactive-color="#ff4949"
+                active-color="#4091ff"
+                inactive-color="#dcdfe6"
                 @change="editZt({ id: scope.row.id, type: scope.row.mg_state })"
               >
               </el-switch>
@@ -117,6 +117,7 @@
           <el-button type="primary" @click="editUser">确 定</el-button>
         </div>
       </el-dialog>
+      <!-- 角色分配模态框 -->
     </el-card>
   </div>
 </template>

@@ -77,8 +77,6 @@ export default {
         type: 'warning'
       })
         .then(() => {
-          console.log(11)
-          // localStorage.removeItem(token)
           sessionStorage.removeItem('token')
           this.$message({
             type: 'success',

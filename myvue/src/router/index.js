@@ -19,17 +19,41 @@ const routes = [{
         name: "home",
         component: () =>
             import ('../views/home'),
-        children: [{
+        children: [
+            // 用户列表
+            {
                 path: '/users',
                 name: "users",
                 component: () =>
                     import ('../views/users')
             },
+            // 欢迎页面
             {
                 path: '/welcome',
                 name: "welcome",
                 component: () =>
                     import ('../views/welcome')
+            },
+            // 角色列表
+            {
+                path: '/roles',
+                name: "roles",
+                component: () =>
+                    import ('../views/roles')
+            },
+            // 权限列表
+            {
+                path: '/rights',
+                name: "rights",
+                component: () =>
+                    import ('../views/rights')
+            },
+            // 商品列表
+            {
+                path: '/goods',
+                name: "goods",
+                component: () =>
+                    import ('../views/goods')
             }
         ]
     }
