@@ -14,7 +14,54 @@
       >
       <el-table :data="tableData" border style="width: 100%" class="mt16">
         <el-table-column type="expand"
-          ><template slot-scope="props"> </template>
+          ><template slot-scope="scope">
+            <div v-if="scope.row.children.length > 0" class="pad">
+              <el-row v-for="item in scope.row.children" :key="item.id">
+                <el-col :span="6">
+                  <el-tag
+                    effect="dark"
+                    closable
+                    @close="closeTag(scope.row, item.id)"
+                    >{{ item.authName }}</el-tag
+                  >
+                </el-col>
+                <el-col :span="18">
+                  <el-row
+                    v-for="item1 in item.children"
+                    :key="item1.id"
+                    style="margin: 8px"
+                  >
+                    <el-col :span="6">
+                      <el-tag
+                        type="success"
+                        effect="dark"
+                        closable
+                        @close="closeTag(scope.row, item1.id)"
+                        >{{ item1.authName }}
+                      </el-tag>
+                    </el-col>
+                    <el-col :span="18">
+                      <el-row>
+                        <el-col :span="24">
+                          <el-tag
+                            v-for="item2 in item1.children"
+                            :key="item2.id"
+                            type="warning"
+                            effect="dark"
+                            class="le"
+                            closable
+                            @close="closeTag(scope.row, item2.id)"
+                            >{{ item2.authName }}</el-tag
+                          >
+                        </el-col>
+                      </el-row>
+                    </el-col>
+                  </el-row>
+                </el-col>
+              </el-row>
+            </div>
+            <div v-else class="pad">暂无权限</div>
+          </template>
         </el-table-column>
         <el-table-column type="index" label="#"> </el-table-column>
         <el-table-column prop="roleName" label="角色名称"> </el-table-column>
@@ -34,7 +81,10 @@
                 @click="del(scope.row.id)"
                 >删除</el-button
               >
-              <el-button type="warning" icon="el-icon-share" @click="gxType"
+              <el-button
+                type="warning"
+                icon="el-icon-s-tools"
+                @click="gxType(scope.row)"
                 >分配权限</el-button
               >
             </div>
@@ -77,21 +127,25 @@
         </div>
       </el-dialog>
       <!-- 权限模态框 -->
-      <el-dialog title="分配权限" :visible.sync="dialogVisible" width="30%">
-        <!-- <el-tree
+      <el-dialog
+        title="分配权限"
+        :visible.sync="dialogVisible"
+        width="40%"
+        :before-close="handleClose"
+      >
+        <el-tree
           :data="list"
           show-checkbox
           node-key="id"
-          :default-expanded-keys="[2, 3]"
-          :default-checked-keys="[5]"
+          :default-checked-keys="checkArr"
           :props="defaultProps"
+          :default-expand-all="true"
+          ref="rightTreeRef"
         >
-        </el-tree> -->
+        </el-tree>
         <span slot="footer" class="dialog-footer">
           <el-button @click="dialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="dialogVisible = false"
-            >确 定</el-button
-          >
+          <el-button type="primary" @click="updateCheck">确 定</el-button>
         </span>
       </el-dialog>
     </el-card>
@@ -128,7 +182,13 @@ export default {
           { required: true, message: '请输入角色描述', trigger: 'blur' }
         ]
       },
-      list: []
+      list: [],
+      defaultProps: {
+        children: 'children',
+        label: 'authName'
+      },
+      typeId: 0,
+      checkArr: []
     }
   },
   created() {
@@ -138,7 +198,6 @@ export default {
     //   请求数据
     async getList() {
       const res = await getRolesApi()
-      console.log(res)
       this.tableData = res
     },
     // 添加角色
@@ -182,20 +241,50 @@ export default {
       console.log(this.editForm)
     },
     // 编辑确认
-    qr() {
-      this.$refs.ruleForm.validate(async (valid) => {
-        if (!valid) return false
-        await editRolesApi(this.editForm)
-        // 关闭模态框
-        this.FormVisible = false
-        this.getList()
-      })
+    async qr() {
+      await editRolesApi(this.editForm)
+      // 关闭模态框
+      this.FormVisible = false
+      this.getList()
     },
     // 权限
-    async gxType() {
+    async gxType(row) {
+      const res = await this.$API.typeApi('tree')
+      this.list = res
+      this.typeId = row.id
+      this.getCheckedIdsArr(row, this.checkArr)
       this.dialogVisible = true
-      //   const res = await typeApi()
-      console.log(res)
+    },
+    // 递归函数
+    getCheckedIdsArr(row, checkArr) {
+      if (!row.children) {
+        return checkArr.push(row.id)
+      }
+      row.children.forEach((item) => {
+        this.getCheckedIdsArr(item, checkArr)
+      })
+    },
+    handleClose() {
+      // this.checkArr = []
+      this.dialogVisible = false
+    },
+    async updateCheck() {
+      // 全选
+      const allCheck = this.$refs.rightTreeRef.getCheckedKeys()
+      // 半选
+      const halfCheck = this.$refs.rightTreeRef.getHalfCheckedKeys()
+      // 合并
+
+      this.checkArr = [...allCheck, ...halfCheck]
+      // 转字符串
+      const arr = this.checkArr.join(',')
+      console.log(this.typeId, arr)
+      await this.$API.getRolesTypeApi(this.typeId, arr)
+      this.dialogVisible = false
+      this.getList()
+    },
+    async closeTag(row, rid) {
+      row.children = await this.$API.removeTypeApi(row.id, rid)
     }
   }
 }

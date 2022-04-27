@@ -50,6 +50,15 @@ export function editUsersApi(data) {
         data
     })
 }
+// 分配用户角色
+export function roleApi(data) {
+    console.log(data);
+    return request({
+        url: `/users/${data.id}/role`,
+        method: "PUT",
+        data
+    })
+}
 // 用户状态
 export function editZtApi(data) {
     return request({
@@ -64,6 +73,7 @@ export function getRolesApi() {
         method: "GET"
     })
 }
+
 // 添加角色
 export function RolesUserApi(data) {
     return request({
@@ -100,5 +110,20 @@ export function goodsApi(params) {
         url: "/goods",
         method: "GET",
         params
+    })
+}
+// 角色授权
+export function getRolesTypeApi(id, rids) {
+    return request({
+        url: `roles/${id}/rights`,
+        method: "POST",
+        data: { rids }
+    })
+}
+// 删除指定角色授权
+export function removeTypeApi(id, rid) {
+    return request({
+        url: `/roles/${id}/rights/${rid}`,
+        method: "DELETE"
     })
 }

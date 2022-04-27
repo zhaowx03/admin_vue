@@ -94,7 +94,7 @@ export default {
     // 左侧菜单栏
     async gitList() {
       const res = await gitLeftLift()
-      console.log(res)
+
       this.list = res
     }
   }

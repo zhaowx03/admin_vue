@@ -6,6 +6,12 @@ import router from './router'
 import store from './store'
 import './plugins/element.js'
 
+import * as API from "@/http/api"
+
+Vue.prototype.$API = API
+
+// console.log(API);
+
 Vue.config.productionTip = false
 
 new Vue({

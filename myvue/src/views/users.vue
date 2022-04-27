@@ -57,7 +57,11 @@
               icon="el-icon-delete"
               @click="remove(scope.row.id)"
             ></el-button>
-            <el-button type="warning" icon="el-icon-share"></el-button>
+            <el-button
+              type="warning"
+              icon="el-icon-s-tools"
+              @click="editRight(scope.row)"
+            ></el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -118,6 +122,25 @@
         </div>
       </el-dialog>
       <!-- 角色分配模态框 -->
+      <el-dialog title="分配角色" :visible.sync="dialogVisible" width="40%">
+        <p>当前用户：{{ roleForm.username }}</p>
+        <p>当前角色：{{ roleForm.role_name }}</p>
+        <p>
+          分配新角色：
+          <el-select v-model="selectVal" placeholder="请选择">
+            <el-option
+              v-for="item in region"
+              :key="item.id"
+              :label="item.roleName"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </p>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="soleAdd">确 定</el-button>
+        </span>
+      </el-dialog>
     </el-card>
   </div>
 </template>
@@ -133,16 +156,22 @@ import {
 export default {
   data() {
     return {
+      // 搜索框的值
       keyword: '',
+      // 列表内容
       tableData: [],
-      // 渲染表格
+      // 渲染表格的数据
       pageInfo: {
         pagesize: 4,
         pagenum: 1,
         query: ''
       },
+      // 总条数
       total: 0,
+      // 添加模态框
       dialogFormVisible: false,
+      // 角色分配模态框
+      dialogVisible: false,
       // 添加的表单
       form: {
         username: '',
@@ -171,15 +200,25 @@ export default {
           }
         ]
       },
-      FormVisible: false,
       // 修改模态框
+      FormVisible: false,
+      // 修改表单
       editForm: {
         username: '',
         email: '',
         mobile: '',
         id: 0
       },
-      editId: 0
+      // 角色分配表单
+      roleForm: {
+        username: '',
+        role_name: '',
+        id: 0
+      },
+      // 下拉菜单
+      region: [],
+      // 下拉菜单值
+      selectVal: ''
     }
   },
   created() {
@@ -189,7 +228,6 @@ export default {
     // 请求用户表格数据
     async getList() {
       const res = await getUsersApi(this.pageInfo)
-      console.log(111)
       this.tableData = res.users
       this.total = res.total
     },
@@ -263,6 +301,23 @@ export default {
     async editUser() {
       await editUsersApi(this.editForm)
       this.FormVisible = false
+      this.getList()
+    },
+    // 角色分配
+    async editRight(row) {
+      console.log(row)
+      this.dialogVisible = true
+      this.roleForm = row
+      const res = await this.$API.getRolesApi()
+      this.region = res
+    },
+    // 分配确定
+    async soleAdd() {
+      await this.$API.roleApi({
+        id: this.roleForm.id,
+        rid: this.selectVal
+      })
+      this.dialogVisible = false
       this.getList()
     }
   }
