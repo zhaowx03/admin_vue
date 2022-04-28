@@ -160,17 +160,17 @@ export default {
     },
     handleSuccess(res) {
       console.log('上传成功', res)
-      this.addgoodsFrom.pics.push({
+      this.addForm.pics.push({
         pic: res.data.tmp_path
       })
     },
     // 删除上传
     handleRemove(res) {
       console.log('删除上传', res)
-      const index = this.addgoodsFrom.pics.findIndex((item) => {
+      const index = this.addForm.pics.findIndex((item) => {
         return item.pic === res.response.data.tmp_path
       })
-      this.addgoodsFrom.pics.splice(index, 1)
+      this.addForm.pics.splice(index, 1)
     },
     handlePreview() {}
   },
