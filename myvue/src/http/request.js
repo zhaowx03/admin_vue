@@ -6,6 +6,8 @@ import Axios from 'axios'
 import encConfig from './env'
 import { Message } from 'element-ui'
 
+import Nprogress from 'nprogress'
+
 //创建axios实例
 const service = Axios.create({
     //设置基地址
@@ -13,9 +15,12 @@ const service = Axios.create({
     timeout: 5000
 })
 
+
+
 //创建请求拦截器
 service.interceptors.request.use(
     (config) => {
+        Nprogress.start()
         config.headers['Authorization'] = sessionStorage.getItem("token")
         return config
     },
@@ -27,7 +32,8 @@ service.interceptors.request.use(
 //创建响应拦截器
 service.interceptors.response.use(
     (res) => {
-        // console.log('res:::', res)
+        Nprogress.done()
+            // console.log('res:::', res)
         const {
             meta: { msg, status: code },
             data: result

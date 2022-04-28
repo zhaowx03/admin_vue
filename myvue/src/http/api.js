@@ -127,3 +127,27 @@ export function removeTypeApi(id, rid) {
         method: "DELETE"
     })
 }
+
+//商品列表请求接口
+export function goodsList(params) {
+    return request({
+        url: "/goods",
+        method: "GET",
+        params
+    })
+}
+// 商品分类列表请求
+export function categoriesApi() {
+    return request({
+        url: "/categories",
+        method: "GET"
+    })
+}
+//封装商品参数的接口
+export function getGoodsparams(cateId, sel = "many") {
+    return request({
+        url: `categories/${cateId}/attributes`,
+        method: "GET",
+        params: { sel }
+    })
+}
